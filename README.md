@@ -72,36 +72,4 @@ Imagine poder planejar cada detalhe da sua próxima aventura, desde escolher dat
 
 Planeje fácil. Viaje tranquilo. Aproveite mais.
 
-# 🎤 Apresentação Oral da SunnyTrips (para plateia)
-
-*Boa tarde, pessoal!*
-
-Todos aqui provavelmente já passaram pela situação de planejar uma viagem incrível, reservar tudo com antecedência, e aí chega o grande dia e... surpresa! Aquela tempestade inesperada ou um calor absurdo acabam atrapalhando seus planos. É frustrante, não é mesmo?
-
-Pois é, nós pensamos nisso, e foi justamente aí que nasceu a ideia da **SunnyTrips**: uma plataforma inteligente que te ajuda a planejar e controlar suas viagens e passeios com muito mais praticidade, e principalmente, sabendo exatamente o clima que vai te esperar no destino.
-
-## 🌞 Mas como exatamente a SunnyTrips faz isso?
-
-Bom, ao criar sua conta rapidamente, você acessa uma área personalizada, simples e intuitiva, que chamamos de **Dashboard**. Nessa tela você consegue facilmente separar suas viagens maiores, aquelas aventuras mais distantes, e também seus passeios rápidos, próximos à sua casa. Tudo isso organizado visualmente, sem complicações.
-
-Agora, vamos supor que você queira visitar aquele parque famoso no próximo sábado. Basta selecionar o local, data e horário, e pronto: nossa plataforma imediatamente mostra como estará o clima previsto para aquele momento. Não tem mais aquela história de sair com guarda-chuva na mão à toa ou esquecer o protetor solar quando o dia está quente!
-
-E tem mais: cada agendamento feito fica salvo na sua lista pessoal. Quer mudar a data? Cancelar? Tudo bem simples, fácil e rápido. Você tem total controle.
-
-## 📍 Perfil sempre à mão!
-
-Na SunnyTrips, também pensamos no seu perfil como algo simples de gerenciar. Seu país, estado e cidade estão sempre visíveis, junto com a temperatura atualizada em tempo real do lugar onde você mora. E se precisar atualizar ou mesmo excluir sua conta, com poucos cliques você faz isso de maneira rápida e segura.
-
-## ✈️ Por que escolher SunnyTrips?
-
-Porque não é apenas sobre facilitar seu planejamento—é sobre garantir que você viva as melhores experiências possíveis sem surpresas desagradáveis pelo caminho.
-
-Imagine aproveitar cada momento da sua viagem, sabendo exatamente o que esperar do clima, da temperatura, sem preocupação com chuva ou sol excessivo. É planejar menos, aproveitar mais, e viver experiências melhores.
-
----
-
-*Então essa é a SunnyTrips!* Uma plataforma feita para quem valoriza praticidade, organização e tranquilidade no dia a dia.
-
-**SunnyTrips: planeje fácil, viaje tranquilo, aproveite mais!**
-
 *Muito obrigado!*
