@@ -1,3 +1,5 @@
+![Descrição banner](https://github.com/user-attachments/assets/a2d506e3-06f9-4909-a5e4-b65871c692df)
+
 # 🌞✈️ SunnyTrips
 
 ### Sua plataforma inteligente para planejar passeios e viagens, com clima sempre ao seu lado!
