@@ -1,4 +1,4 @@
-![Descrição banner](https://github.com/user-attachments/assets/b266f509-cfc4-4948-b8c0-fa916f8b26cc)
+![Descrição banner](https://github.com/user-attachments/assets/844b6e0a-2800-41cb-b7c4-ecde8e5b2d40)
 
 # 🌞✈️ SunnyTrips
 
