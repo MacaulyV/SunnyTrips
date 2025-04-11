@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | SunnyTrips</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Google Material Icons - biblioteca de ícones mais confiável -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  
+  <!-- Font Awesome - mantido como fallback -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Estilos inline para garantir que os emojis funcionem -->
+  <style>
+    .emoji-icon {
+      font-size: 16px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    
+    .input-container {
+      position: relative;
+    }
+    
+    .emoji-icon.input-icon {
+      position: absolute;
+      top: 50%;
+      left: 12px;
+      transform: translateY(-50%);
+      z-index: 2;
+    }
+  </style>
+  
+  <!-- Script para detectar origem do usuário (login ou cadastro) -->
+  <script th:inline="javascript">
+    // Função para adicionar mensagens de log
+    function logDeteccao(mensagem) {
+      console.log('[Detecção de Origem]', mensagem);
+    }
+    
+    logDeteccao('Iniciando detecção de origem do usuário');
+    logDeteccao('URL atual: ' + window.location.href);
+    logDeteccao('Referrer: ' + document.referrer);
+    
+    // Verifica se veio da página de cadastro via parâmetro URL (método principal)
+    let detectadoNovoUsuario = false;
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('novoUsuario') === 'true') {
+      detectadoNovoUsuario = true;
+      logDeteccao('Detectado como novo usuário via parâmetro URL');
+    }
+    
+    // Verifica se o usuário veio da página de cadastro via referrer
+    const referer = document.referrer;
+    if (referer && (referer.includes('/cadastro') || referer.includes('/registro') || referer.includes('/signup'))) {
+      detectadoNovoUsuario = true;
+      logDeteccao('Detectado como novo usuário via referrer do cadastro');
+      
+      // Marca como novo usuário vindo do cadastro
+      sessionStorage.setItem('cadastroRecente', 'true');
+      
+      // Define parâmetro na URL para ser detectado pelo JavaScript principal
+      const urlAtual = new URL(window.location.href);
+      urlAtual.searchParams.set('novoUsuario', 'true');
+      window.history.replaceState({}, document.title, urlAtual.toString());
+    }
+    // Verifica se o usuário veio da página de login
+    else if (referer && (referer.includes('/login') || referer.includes('/entrar'))) {
+      // Se veio do login, marca como login recente
+      sessionStorage.setItem('loginRecente', 'true');
+      logDeteccao('Detectado como login recente');
+    }
+    
+    // Verificação adicional: se o localStorage não tem a informação de usuário existente,
+    // é muito provável que seja a primeira visita do usuário após cadastro
+    if (!localStorage.getItem('usuarioExistente') && !detectadoNovoUsuario) {
+      detectadoNovoUsuario = true;
+      logDeteccao('Detectado como novo usuário (primeira visita) via localStorage');
+      
+      // Define parâmetro na URL e sessionStorage
+      sessionStorage.setItem('cadastroRecente', 'true');
+      const urlAtual = new URL(window.location.href);
+      urlAtual.searchParams.set('novoUsuario', 'true');
+      window.history.replaceState({}, document.title, urlAtual.toString());
+    }
+    
+    // Verificação final
+    logDeteccao('Estado final da detecção:');
+    logDeteccao('- Novo usuário: ' + detectadoNovoUsuario);
+    logDeteccao('- Login recente: ' + (sessionStorage.getItem('loginRecente') === 'true'));
+    logDeteccao('- Flag cadastroRecente: ' + (sessionStorage.getItem('cadastroRecente') === 'true'));
+    logDeteccao('- Parâmetro novoUsuario na URL: ' + (new URLSearchParams(window.location.search).get('novoUsuario') === 'true'));
+  </script>
+  
+  <!-- SCRIPT DE EMERGÊNCIA PARA FONT AWESOME - Adicionado no início para garantir carregamento -->
+  <script>
+    // Função de emergência para garantir o carregamento do Font Awesome
+    (function() {
+      // Verificar se o Font Awesome já está carregado adequadamente
+      function isFontAwesomeLoaded() {
+        const testElement = document.createElement('i');
+        testElement.className = 'fas fa-home fa-test-element';
+        testElement.style.display = 'none';
+        document.body.appendChild(testElement);
+        
+        const style = window.getComputedStyle(testElement, '::before');
+        const isLoaded = style && style.content && 
+                        style.content !== 'none' && 
+                        style.content !== '' && 
+                        style.content !== 'normal';
+        
+        document.body.removeChild(testElement);
+        return isLoaded;
+      }
+      
+      // Função para adicionar Font Awesome com prioridade máxima
+      function injectFontAwesome() {
+        console.log('[EMERGÊNCIA] Injetando Font Awesome diretamente no cabeçalho...');
+        
+        // 1. Adicionar como primeira entrada no head para máxima prioridade
+        const links = [
+          { href: 'https://use.fontawesome.com/releases/v6.4.0/css/all.css' },
+          { href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', integrity: 'sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==', crossorigin: 'anonymous' },
+          { href: 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css' }
+        ];
+        
+        // Inserir os links no início do head (em ordem reversa para manter a prioridade)
+        links.forEach(linkData => {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = linkData.href;
+          if (linkData.integrity) {
+            link.integrity = linkData.integrity;
+            link.crossOrigin = 'anonymous';
+          }
+          
+          // Inserir como primeiro elemento do head
+          document.head.insertBefore(link, document.head.firstChild);
+        });
+        
+        // 2. Adicionar regras de CSS críticas inline
+        const style = document.createElement('style');
+        style.id = 'font-awesome-emergency-css';
+        style.textContent = `
+          @font-face {
+            font-family: 'Font Awesome 6 Free';
+            font-style: normal;
+            font-weight: 900;
+            font-display: block;
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2'),
+                 url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.ttf') format('truetype');
+          }
+          
+          @font-face {
+            font-family: 'Font Awesome 6 Free';
+            font-style: normal;
+            font-weight: 400;
+            font-display: block;
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.woff2') format('woff2'),
+                 url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.ttf') format('truetype');
+          }
+          
+          @font-face {
+            font-family: 'Font Awesome 6 Brands';
+            font-style: normal;
+            font-weight: 400;
+            font-display: block;
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2') format('woff2'),
+                 url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.ttf') format('truetype');
+          }
+          
+          .fas, .fa-solid { font-family: 'Font Awesome 6 Free' !important; font-weight: 900 !important; }
+          .far, .fa-regular { font-family: 'Font Awesome 6 Free' !important; font-weight: 400 !important; }
+          .fab, .fa-brands { font-family: 'Font Awesome 6 Brands' !important; font-weight: 400 !important; }
+          
+          /* Definições críticas dos ícones mais utilizados */
+          .fa-home:before { content: "\\f015" !important; }
+          .fa-user:before { content: "\\f007" !important; }
+          .fa-cog:before { content: "\\f013" !important; }
+          .fa-comment:before { content: "\\f075" !important; }
+          .fa-sign-out-alt:before { content: "\\f2f5" !important; }
+          .fa-bell:before { content: "\\f0f3" !important; }
+          .fa-search:before { content: "\\f002" !important; }
+          .fa-sun:before { content: "\\f185" !important; }
+          .fa-sync-alt:before { content: "\\f2f1" !important; }
+          .fa-ellipsis-v:before { content: "\\f142" !important; }
+          .fa-tint:before { content: "\\f043" !important; }
+          .fa-wind:before { content: "\\f72e" !important; }
+        `;
+        document.head.appendChild(style);
+        
+        // 3. Fazer pré-fetch dos webfonts críticos para acelerar o carregamento
+        const fontFiles = [
+          'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2',
+          'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.woff2'
+        ];
+        
+        fontFiles.forEach(url => {
+          const link = document.createElement('link');
+          link.rel = 'preload';
+          link.href = url;
+          link.as = 'font';
+          link.type = 'font/woff2';
+          link.crossOrigin = 'anonymous';
+          document.head.appendChild(link);
+        });
+        
+        // 4. Adicionar fallback para SVG (baseado no kit.fontawesome.com)
+        const script = document.createElement('script');
+        script.defer = true;
+        script.src = 'https://ka-f.fontawesome.com/releases/v6.4.0/js/all.js';
+        document.head.appendChild(script);
+      }
+      
+      // Executar imediatamente e também quando o DOM estiver pronto
+      injectFontAwesome();
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        if (!isFontAwesomeLoaded()) {
+          console.log('[EMERGÊNCIA] Font Awesome não carregado após DOMContentLoaded, reinjetando...');
+          injectFontAwesome();
+        }
+      });
+      
+      // Último recurso - verificar após o carregamento completo da página
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          if (!isFontAwesomeLoaded()) {
+            console.log('[EMERGÊNCIA] Font Awesome não carregado após load, tentativa final...');
+            injectFontAwesome();
+            
+            // Adicionar botão de emergência visível 
+            setTimeout(function() {
+              const button = document.createElement('button');
+              button.id = 'font-awesome-emergency-button';
+              button.innerText = 'Recarregar Ícones';
+              button.style.position = 'fixed';
+              button.style.top = '10px';
+              button.style.left = '10px';
+              button.style.zIndex = '99999';
+              button.style.padding = '10px 15px';
+              button.style.background = 'red';
+              button.style.color = 'white';
+              button.style.border = 'none';
+              button.style.borderRadius = '4px';
+              button.style.fontWeight = 'bold';
+              button.style.cursor = 'pointer';
+              
+              button.addEventListener('click', function() {
+                injectFontAwesome();
+                alert('Tentativa de recarregar ícones executada. Por favor, recarregue a página se os ícones ainda não aparecerem.');
+              });
+              
+              document.body.appendChild(button);
+            }, 3000);
+          }
+        }, 2000);
+      });
+    })();
+  </script>
+
+  <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+  <!-- Atualização da referência do Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Font Awesome Alternativo (fallback) -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" />
+  <!-- Google Fonts - Poppins & Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Script polyfill para navegadores antigos -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+</head>
+<body>
+  <!-- Overlay de fundo animado -->
+  <div class="animated-background">
+    <div class="gradient-sphere"></div>
+    <div class="gradient-sphere secondary"></div>
+    <div class="animated-waves"></div>
+    <div class="noise-overlay"></div>
+  </div>
+  
+  <div class="dashboard-container">
+    <!-- Barra Lateral de Navegação -->
+    <aside class="sidebar">
+      <div class="logo-container">
+        <img th:src="@{/images/LogoSunnyTrips.png}" alt="SunnyTrips" class="logo-image" />
+        <div class="logo-text">Sunny<span>Trips</span></div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item active" data-tooltip="Início">
+            <div class="nav-icon-container">
+              <i class="fas fa-home"></i>
+              <span class="nav-text">Início</span>
+            </div>
+          </li>
+          <li class="nav-item" data-tooltip="Admin">
+            <div class="nav-icon-container">
+              <i class="fas fa-user"></i>
+              <span class="nav-text">Admin</span>
+            </div>
+          </li>
+          <li class="nav-item" data-tooltip="Viagem">
+            <div class="nav-icon-container">
+              <i class="fas fa-plane"></i>
+              <span class="nav-text">Viagem</span>
+            </div>
+          </li>
+          <li class="nav-item" data-tooltip="Passeio">
+            <div class="nav-icon-container">
+              <i class="fas fa-umbrella-beach"></i>
+              <span class="nav-text">Passeio</span>
+            </div>
+          </li>
+          <li class="nav-item" data-tooltip="Planejamentos">
+            <div class="nav-icon-container">
+              <i class="fas fa-calendar-alt"></i>
+              <span class="nav-text">Planejamentos</span>
+            </div>
+          </li>
+          <li class="nav-item" data-tooltip="Editar dados" onclick="editarPerfil()">
+            <div class="nav-icon-container">
+              <i class="fas fa-user-edit"></i>
+              <span class="nav-text">Editar perfil</span>
+            </div>
+          </li>
+          <li class="nav-item logout" data-tooltip="Sair" onclick="confirmarLogout()">
+            <div class="nav-icon-container">
+              <i class="fas fa-sign-out-alt"></i>
+              <span class="nav-text">Sair</span>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Área de Conteúdo Principal -->
+    <main class="main-content">
+      <!-- Cabeçalho com boas-vindas e busca -->
+      <header class="main-header">
+        <div class="welcome-section">
+          <div class="avatar-container">
+            <div class="avatar-outline"></div>
+            <img id="avatar-img-header" src="/images/avatar-default.png" alt="Foto de perfil" class="avatar-image" />
+            <div class="avatar-status online"></div>
+          </div>
+          <div class="welcome-text">
+            <p class="welcome-greeting">Olá👋</p>
+            <h2 class="welcome-name" th:text="${session.usuario.nome}">Nome do Usuário</h2>
+          </div>
+        </div>
+        
+        <div class="search-container">
+          <div class="search-bar">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Pesquisar um local..." class="search-input" />
+            <button class="search-button">
+              <span class="button-text">Buscar</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <div class="header-icon-wrapper notification" data-count="5">
+            <i class="far fa-bell"></i>
+            <div class="notification-dot"></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Container principal com grid de cards -->
+      <div class="dashboard-content-wrapper">
+        <div class="section-heading">
+          <h2 class="gradient-title">Planeje suas Viagens e Passeios com a Nossa Plataforma</h2>
+          <p class="date-display">Hoje, <span id="current-date">10 de abril de 2025</span><span id="current-time" class="time-display">00:00:00</span></p>
+          <div class="platform-description">
+            <p>Organize suas aventuras com tranquilidade, sabendo exatamente como estará o clima no seu destino.</p>
+            <p>A <span class="logo-highlight"><span class="sunny">Sunny</span><span class="trips">Trips</span></span> conecta seus planos de viagem com previsões meteorológicas precisas para viagens sem surpresas.</p>
+          </div>
+        </div>
+        
+        <!-- Seção de Planejamento de Viagem -->
+        <div class="travel-destinations">
+          <div class="destination-header">
+            <h3 class="destination-heading">
+              <i class="fas fa-map-marked-alt"></i>
+              Começe a planejar sua proxima viagem
+            </h3>
+            <div class="destination-filters">
+              <button class="filter-btn active" data-filter="local">Nacional</button>
+              <button class="filter-btn" data-filter="internacional">Internacional</button>
+            </div>
+          </div>
+          <div class="destination-cards-container" id="local-cards">
+            <!-- Card de Planejamento 1 - Local -->
+            <div class="destination-card">
+              <div class="destination-image-container video-container">
+                <video class="destination-video" autoplay loop muted playsinline>
+                  <source src="/images/destinos/jordao.mp4" type="video/mp4">
+                  <!-- Fallback para navegadores que não suportam vídeo -->
+                </video>
+                <div class="destination-overlay"></div>
+              </div>
+              <div class="destination-info">
+                <p class="destination-country"><i class="fas fa-globe"></i> Brasil</p>
+                <p class="destination-state">São Paulo</p>
+                <h4 class="destination-city">Campos do Jordão</h4>
+                <!-- Weather info section -->
+                <div class="destination-weather" data-city="Campos do Jordão">
+                  <div class="destination-weather-icon">
+                    <i class="fas fa-cloud"></i>
+                    <!-- Will be replaced by API icon -->
+                  </div>
+                  <div class="destination-weather-info">
+                    <span class="destination-weather-condition">Carregando...</span>
+                    <span class="destination-weather-temp">--°C</span>
+                  </div>
+                </div>
+                <div class="destination-action">
+                  <button class="destination-plan-btn">
+                    <i class="fas fa-plane"></i> Planejar
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Card de Planejamento 2 - Local -->
+            <div class="destination-card">
+              <div class="destination-image-container video-container">
+                <video class="destination-video" autoplay loop muted playsinline>
+                  <source src="/images/destinos/ubatuba.mp4" type="video/mp4">
+                  <!-- Fallback para navegadores que não suportam vídeo -->
+                </video>
+                <div class="destination-overlay"></div>
+              </div>
+              <div class="destination-info">
+                <p class="destination-country"><i class="fas fa-globe"></i> Brasil</p>
+                <p class="destination-state">São Paulo</p>
+                <h4 class="destination-city">Ubatuba</h4>
+                <!-- Weather info section -->
+                <div class="destination-weather" data-city="Ubatuba">
+                  <div class="destination-weather-icon">
+                    <i class="fas fa-cloud"></i>
+                    <!-- Will be replaced by API icon -->
+                  </div>
+                  <div class="destination-weather-info">
+                    <span class="destination-weather-condition">Carregando...</span>
+                    <span class="destination-weather-temp">--°C</span>
+                  </div>
+                </div>
+                <div class="destination-action">
+                  <button class="destination-plan-btn">
+                    <i class="fas fa-plane"></i> Planejar
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Card de Planejamento 3 - Local -->
+            <div class="destination-card">
+              <div class="destination-image-container video-container">
+                <video class="destination-video" autoplay loop muted playsinline>
+                  <source src="/images/destinos/ilhabela.mp4" type="video/mp4">
+                  <!-- Fallback para navegadores que não suportam vídeo -->
+                </video>
+                <div class="destination-overlay"></div>
+              </div>
+              <div class="destination-info">
+                <p class="destination-country"><i class="fas fa-globe"></i> Brasil</p>
+                <p class="destination-state">São Paulo</p>
+                <h4 class="destination-city">ilhabela</h4>
+                <!-- Weather info section -->
+                <div class="destination-weather" data-city="Ilhabela">
+                  <div class="destination-weather-icon">
+                    <i class="fas fa-cloud"></i>
+                    <!-- Will be replaced by API icon -->
+                  </div>
+                  <div class="destination-weather-info">
+                    <span class="destination-weather-condition">Carregando...</span>
+                    <span class="destination-weather-temp">--°C</span>
+                  </div>
+                </div>
+                <div class="destination-action">
+                  <button class="destination-plan-btn">
+                    <i class="fas fa-plane"></i> Planejar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Cards internacionais (inicialmente ocultos) -->
+          <div class="destination-cards-container" id="internacional-cards" style="display: none;">
+            <!-- Card de Planejamento 1 - Internacional -->
+            <div class="destination-card">
+              <div class="destination-image-container video-container">
+                <video class="destination-video" autoplay loop muted playsinline>
+                  <source src="/images/destinos/paris.mp4" type="video/mp4">
+                  <!-- Fallback para navegadores que não suportam vídeo -->
+                </video>
+                <div class="destination-overlay"></div>
+              </div>
+              <div class="destination-info">
+                <p class="destination-country"><i class="fas fa-globe"></i> França</p>
+                <p class="destination-state">Ilha de França</p>
+                <h4 class="destination-city">Paris</h4>
+                <!-- Weather info section -->
+                <div class="destination-weather" data-city="Paris">
+                  <div class="destination-weather-icon">
+                    <i class="fas fa-cloud"></i>
+                    <!-- Will be replaced by API icon -->
+                  </div>
+                  <div class="destination-weather-info">
+                    <span class="destination-weather-condition">Carregando...</span>
+                    <span class="destination-weather-temp">--°C</span>
+                  </div>
+                </div>
+                <div class="destination-action">
+                  <button class="destination-plan-btn">
+                    <i class="fas fa-plane"></i> Planejar
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Card de Planejamento 2 - Internacional -->
+            <div class="destination-card">
+              <div class="destination-image-container video-container">
+                <video class="destination-video" autoplay loop muted playsinline>
+                  <source src="/images/destinos/tokio.mp4" type="video/mp4">
+                  <!-- Fallback para navegadores que não suportam vídeo -->
+                </video>
+                <div class="destination-overlay"></div>
+              </div>
+              <div class="destination-info">
+                <p class="destination-country"><i class="fas fa-globe"></i> Japão</p>
+                <p class="destination-state">Kanto</p>
+                <h4 class="destination-city">Tóquio</h4>
+                <!-- Weather info section -->
+                <div class="destination-weather" data-city="Tokyo">
+                  <div class="destination-weather-icon">
+                    <i class="fas fa-cloud"></i>
+                    <!-- Will be replaced by API icon -->
+                  </div>
+                  <div class="destination-weather-info">
+                    <span class="destination-weather-condition">Carregando...</span>
+                    <span class="destination-weather-temp">--°C</span>
+                  </div>
+                </div>
+                <div class="destination-action">
+                  <button class="destination-plan-btn">
+                    <i class="fas fa-plane"></i> Planejar
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Card de Planejamento 3 - Internacional -->
+            <div class="destination-card">
+              <div class="destination-image-container video-container">
+                <video class="destination-video" autoplay loop muted playsinline>
+                  <source src="/images/destinos/new-york.mp4" type="video/mp4">
+                  <!-- Fallback para navegadores que não suportam vídeo -->
+                </video>
+                <div class="destination-overlay"></div>
+              </div>
+              <div class="destination-info">
+                <p class="destination-country"><i class="fas fa-globe"></i> Estados Unidos</p>
+                <p class="destination-state">Nova York</p>
+                <h4 class="destination-city">Nova York</h4>
+                <!-- Weather info section -->
+                <div class="destination-weather" data-city="New York">
+                  <div class="destination-weather-icon">
+                    <i class="fas fa-cloud"></i>
+                    <!-- Will be replaced by API icon -->
+                  </div>
+                  <div class="destination-weather-info">
+                    <span class="destination-weather-condition">Carregando...</span>
+                    <span class="destination-weather-temp">--°C</span>
+                  </div>
+                </div>
+                <div class="destination-action">
+                  <button class="destination-plan-btn">
+                    <i class="fas fa-plane"></i> Planejar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Barra Lateral Direita - Perfil -->
+    <aside class="profile-sidebar">
+      <!-- Vídeo de fundo do perfil -->
+      <div class="profile-background">
+        <video class="profile-video" id="profileVideo" muted playsinline preload="auto">
+          <source th:src="@{/images/CapaPerfil3.mp4}" type="video/mp4">
+          Seu navegador não suporta o elemento de vídeo.
+        </video>
+        <div class="profile-overlay"></div>
+      </div>
+      
+      <div class="profile-container">
+        <!-- Cabeçalho do Perfil -->
+        <div class="profile-header">
+          <h3 class="profile-title">Meu Perfil</h3>
+          <div class="profile-settings" id="configuracoes">
+            <div class="settings-icon-container">
+              <i class="fas fa-cog settings-icon"></i>
+            </div>
+            <div class="settings-dropdown" id="menuConfiguracoes">
+              <div class="settings-item" onclick="editarPerfil()">
+                <i class="fas fa-user-edit"></i>
+                <span>Editar dados</span>
+              </div>
+              <div class="settings-item" onclick="alterarFotoPerfil()">
+                <i class="fas fa-camera"></i>
+                <span>Alterar foto</span>
+              </div>
+              <div class="settings-item theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon" id="themeIcon"></i>
+                <span id="themeText">Modo escuro</span>
+              </div>
+              <div class="settings-item" onclick="confirmarExclusao()">
+                <i class="fas fa-user-times"></i>
+                <span>Excluir conta</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Conteúdo do Perfil -->
+        <div class="profile-content">
+          <div class="profile-avatar-container">
+            <div class="profile-avatar-outline"></div>
+            <img id="avatar-img" src="/images/avatar-default.png" alt="Foto de perfil" class="profile-avatar">
+            <div class="avatar-overlay">
+              <i class="fas fa-camera"></i>
+            </div>
+          </div>
+          <input type="file" id="upload-profile-image" accept="image/*" style="display: none;">
+          <h2 class="profile-name" th:text="${session.usuario.nome}">Nome do Usuário</h2>
+          <p class="profile-country" th:text="${session.usuario.pais}">País do Usuário</p>
+          
+          <!-- Indicador de status com animação pulsante -->
+          <div class="profile-status">
+            <span class="status-indicator"></span>
+            <span class="status-text">Online agora</span>
+          </div>
+        </div>
+        
+        <!-- Card de localização -->
+        <div class="profile-location-card">
+          <div class="location-container">
+            <div class="location-item">
+              <div class="location-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <div class="location-text">
+                <span class="location-label">Estado</span>
+                <span class="location-value" th:text="${session.usuario.estado}">Estado do Usuário</span>
+              </div>
+            </div>
+            <div class="location-item">
+              <div class="location-icon">
+                <i class="fas fa-city"></i>
+              </div>
+              <div class="location-text">
+                <span class="location-label">Cidade</span>
+                <span class="location-value" th:text="${session.usuario.cidade}">Cidade do Usuário</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Card de clima atual -->
+        <div class="profile-weather-card" data-city="" title="Carregando dados do clima...">
+          <div class="weather-glass-effect"></div>
+          <div class="profile-weather-icon">
+            <i class="fas fa-cloud" data-icon-code=""></i>
+            <!-- Elemento img será adicionado dinamicamente pelo JavaScript quando usar ícones da API -->
+          </div>
+          <div class="profile-weather-info">
+            <span class="profile-weather-condition">Carregando...</span>
+            <span class="profile-weather-temp" data-feels-like="">--°C</span>
+          </div>
+        </div>
+        
+        <!-- Últimas atividades -->
+        <div class="recent-activities">
+          <h4 class="activities-title">Atividades Recentes</h4>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon">
+                <i class="fas fa-map-pin"></i>
+              </div>
+              <div class="activity-details">
+                <p class="activity-text">Você planejou uma viagem para <strong>Rio de Janeiro</strong></p>
+                <span class="activity-time">2 horas atrás</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">
+                <i class="fas fa-bookmark"></i>
+              </div>
+              <div class="activity-details">
+                <p class="activity-text">Você salvou <strong>Praia de Copacabana</strong> aos favoritos</p>
+                <span class="activity-time">Ontem</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Modal para Edição de Perfil -->
+  <div id="modalEditProfile" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Perfil</h3>
+        <span class="close-modal" onclick="closeModal('EditProfile')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="formEditProfile" class="form-container">
+          <input type="hidden" id="userId" th:value="${session.usuario.id}" />
+          
+          <div class="form-group">
+            <label for="nome">Nome</label>
+            <div class="input-container">
+              <i class="fas fa-user input-icon"></i>
+              <input type="text" id="nome" name="nome" th:value="${session.usuario.nome}" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email</label>
+            <div class="input-container">
+              <i class="fas fa-envelope input-icon"></i>
+              <input type="email" id="email" name="email" th:value="${session.usuario.email}" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="senha">Senha</label>
+            <div class="input-container password-container">
+              <i class="fas fa-lock input-icon"></i>
+              <input type="password" id="senha" name="senha" placeholder="Digite sua senha ou uma nova senha" required>
+              <span class="toggle-password" onclick="togglePasswordVisibilityEdit()">
+                <i class="fas fa-eye"></i>
+              </span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="pais">País</label>
+            <div class="input-container">
+              <i class="fas fa-globe input-icon"></i>
+              <input type="text" id="pais" name="pais" th:value="${session.usuario.pais}" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group half">
+              <label for="estado">Estado</label>
+              <div class="input-container">
+                <i class="fas fa-map input-icon"></i>
+                <input type="text" id="estado" name="estado" th:value="${session.usuario.estado}" required>
+              </div>
+            </div>
+            
+            <div class="form-group half">
+              <label for="cidade">Cidade</label>
+              <div class="input-container">
+                <i class="fas fa-city input-icon"></i>
+                <input type="text" id="cidade" name="cidade" th:value="${session.usuario.cidade}" required>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('EditProfile')">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Confirmação de Exclusão de Conta -->
+  <div id="modalDeleteConfirm" class="modal">
+    <div class="modal-content delete-modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirmar Exclusão</h3>
+        <span class="close-modal" onclick="closeModal('DeleteConfirm')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="delete-warning">
+          <i class="fas fa-exclamation-triangle warning-icon"></i>
+          <p>Deseja realmente excluir sua conta? Essa ação não pode ser desfeita.</p>
+        </div>
+        <div class="delete-actions">
+          <button class="btn btn-secondary" onclick="closeModal('DeleteConfirm')">Cancelar</button>
+          <button class="btn btn-danger" onclick="excluirConta()">Confirmar Exclusão</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Confirmação de Logout -->
+  <div id="modalLogoutConfirm" class="modal">
+    <div class="modal-content logout-modal">
+      <div class="modal-body logout-simple">
+        <div class="logout-message-simple">
+          <span class="logout-icon">
+            <i class="fas fa-sign-out-alt"></i>
+          </span>
+          <p>Deseja realmente sair da sua conta?</p>
+        </div>
+        <div class="logout-actions">
+          <button class="btn-outline" onclick="closeModal('LogoutConfirm')">Voltar</button>
+          <button class="btn-confirm" onclick="realizarLogout()">Sim, sair</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Planejamento de Viagem -->
+  <div id="modalPlanTrip" class="modal">
+    <div class="modal-content">
+      <!-- Vídeo de fundo do destino -->
+      <div class="destination-video-container">
+        <video id="tripPlanningVideo" class="destination-video" loop muted></video>
+        <div class="video-overlay"></div>
+      </div>
+      <div class="modal-header">
+        <h3 class="modal-title">Planejar Viagem</h3>
+        <span class="close-modal" onclick="closeModal('PlanTrip')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="formPlanTrip" class="form-container">
+          <input type="hidden" id="tripUserId" th:value="${session.usuario.id}" />
+          
+          <div class="form-group">
+            <label for="tripPais">País</label>
+            <div class="input-container readonly-container">
+              <i class="fas fa-globe input-icon"></i>
+              <input type="text" id="tripPais" name="paisDestino" readonly required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group half">
+              <label for="tripEstado">Estado</label>
+              <div class="input-container readonly-container">
+                <i class="fas fa-map input-icon"></i>
+                <input type="text" id="tripEstado" name="estadoDestino" readonly required>
+              </div>
+            </div>
+            
+            <div class="form-group half">
+              <label for="tripCidade">Cidade</label>
+              <div class="input-container readonly-container">
+                <i class="fas fa-city input-icon"></i>
+                <input type="text" id="tripCidade" name="cidadeDestino" readonly required>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="tripData">Data da Viagem</label>
+            <div class="input-container">
+              <span class="emoji-icon input-icon">📅</span>
+              <select id="tripData" name="dataViagem" class="select-with-padding" required>
+                <option value="">Selecione a data</option>
+                <!-- As opções serão preenchidas via JavaScript -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tripHora">Hora da Viagem</label>
+            <div class="input-container">
+              <span class="emoji-icon input-icon">⏰</span>
+              <select id="tripHora" name="horaViagem" class="select-with-padding" required>
+                <option value="">Selecione a hora</option>
+                <!-- As opções serão preenchidas via JavaScript -->
+              </select>
+            </div>
+          </div>
+          
+          <!-- Previsão do clima para o dia escolhido -->
+          <div class="trip-weather-preview">
+            <h4>Previsão do Tempo</h4>
+            <div class="trip-weather-container">
+              <div class="trip-weather-icon">
+                <!-- Aqui será inserida a imagem do ícone da API -->
+                <i class="fas fa-cloud-sun"></i>
+              </div>
+              <div class="trip-weather-info">
+                <span class="trip-weather-condition">Selecione uma data</span>
+                <span class="trip-weather-temp">--°C</span>
+              </div>
+            </div>
+            <!-- Aqui serão inseridos os detalhes adicionais do clima via JavaScript -->
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('PlanTrip')">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Confirmar Planejamento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notificações temporárias -->
+  <div class="notification-container" id="notificationContainer"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Script para garantir que a mensagem de boas-vindas seja exibida -->
+  <script>
+    // Função para verificar e forçar o parâmetro de novo usuário
+    (function() {
+      // Verificar se é um novo usuário sem histórico no site
+      if (!localStorage.getItem('usuarioExistente')) {
+        console.log('Verificação adicional: usuário sem histórico detectado');
+        sessionStorage.setItem('cadastroRecente', 'true');
+        
+        // Adicionar parâmetro na URL apenas se ainda não existir
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('novoUsuario') !== 'true') {
+          console.log('Adicionando parâmetro novoUsuario=true na URL');
+          const urlAtual = new URL(window.location.href);
+          urlAtual.searchParams.set('novoUsuario', 'true');
+          window.history.replaceState({}, document.title, urlAtual.toString());
+        }
+      }
+    })();
+  </script>
+  
+  <!-- Carregar o script principal depois de todas as verificações -->
+  <script th:src="@{/js/dashboard.js}"></script>
+  
+  <!-- Script para garantir a funcionalidade dos ícones -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("Verificando carregamento dos ícones do Material Icons...");
+      
+      // Verificar se os ícones do Material Icons foram carregados corretamente
+      function verificarIcones() {
+        // Isso é menos crítico para o Material Icons, mas mantém a verificação
+        const testIcon = document.createElement('span');
+        testIcon.className = 'material-icons';
+        testIcon.textContent = 'check';
+        testIcon.style.visibility = 'hidden';
+        document.body.appendChild(testIcon);
+        
+        // Verificar se o ícone está sendo exibido com o tamanho correto
+        const style = window.getComputedStyle(testIcon);
+        const fontFamily = style.fontFamily.toLowerCase();
+        const isLoaded = fontFamily.includes('material');
+        
+        document.body.removeChild(testIcon);
+        
+        if (!isLoaded) {
+          console.warn("Material Icons pode não estar carregado corretamente. Aplicando fallback...");
+          aplicarFallback();
+        } else {
+          console.log("Material Icons carregado com sucesso!");
+        }
+      }
+      
+      // Aplicar fallback para os ícones caso necessário
+      function aplicarFallback() {
+        // Usando caracteres Unicode para representar ícones básicos
+        const icones = {
+          'calendar_today': '📅',
+          'schedule': '⏰',
+          'home': '🏠',
+          'person': '👤',
+          'settings': '⚙️',
+          'logout': '🚪'
+        };
+        
+        // Substituir ícones não carregados por texto
+        document.querySelectorAll('.material-icons').forEach(icon => {
+          const iconName = icon.textContent.trim();
+          if (icones[iconName]) {
+            icon.textContent = icones[iconName];
+            icon.classList.remove('material-icons');
+            icon.classList.add('icon-fallback');
+          }
+        });
+        
+        // Adicionar estilo para os ícones de fallback
+        const style = document.createElement('style');
+        style.textContent = `
+          .icon-fallback {
+            font-size: 18px;
+            display: inline-block;
+            vertical-align: middle;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      
+      // Executar verificação após um curto delay
+      setTimeout(verificarIcones, 500);
+    });
+  </script>
+</body>
+</html>
+

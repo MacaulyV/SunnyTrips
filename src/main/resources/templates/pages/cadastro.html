@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SunnyTrips | Cadastro</title>
+    <link rel="stylesheet" th:href="@{/css/cadastro.css}">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Anime.js para animações -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+<body>
+<div class="page-background">
+    <div class="animated-wave"></div>
+    <div class="animated-wave wave-2"></div>
+    <div class="animated-wave wave-3"></div>
+</div>
+
+<div class="login-container">
+    <!-- Coluna do formulário de cadastro -->
+    <div class="login-form-column">
+        <!-- Logo do projeto -->
+        <img th:src="@{/images/LogoBlackSunnyTrips.png}" alt="Logo SunnyTrips" class="home-icon logo-animation">
+
+        <h2 class="title-animation">Crie sua conta</h2>
+        <p class="subtitle-animation">Cadastre-se e comece a planejar sua próxima aventura!</p>
+
+        <!-- Exibe mensagem de erro, se existir -->
+        <div class="error-message" id="errorMessage" style="display: none;"></div>
+
+        <form id="registerForm" onsubmit="event.preventDefault(); cadastrarUsuario();">
+            <div class="input-group input-animation">
+                <input type="text" id="nome" name="nome" placeholder="Nome Completo" required>
+                <span class="icon">
+                    <i class="fas fa-user"></i>
+                </span>
+                <div class="input-focus-effect"></div>
+            </div>
+
+            <div class="input-group input-animation">
+                <input type="email" id="email" name="email" placeholder="Email" required>
+                <span class="icon">
+                    <i class="fas fa-envelope"></i>
+                </span>
+                <div class="input-focus-effect"></div>
+            </div>
+
+            <div class="input-group input-animation">
+                <input type="password" id="senha" name="senha" placeholder="Senha" required minlength="6">
+                <span class="icon toggle-password">
+                    <i class="fas fa-eye"></i>
+                </span>
+                <div class="input-focus-effect"></div>
+            </div>
+
+            <div class="input-group input-animation">
+                <select id="pais" name="pais" required>
+                    <option value="" disabled selected>Selecione seu país</option>
+                    <option value="Alemanha">Alemanha</option>
+                    <option value="Argentina">Argentina</option>
+                    <option value="Austrália">Austrália</option>
+                    <option value="Brasil">Brasil</option>
+                    <option value="Canadá">Canadá</option>
+                    <option value="China">China</option>
+                    <option value="Espanha">Espanha</option>
+                    <option value="Estados Unidos">Estados Unidos</option>
+                    <option value="França">França</option>
+                    <option value="Índia">Índia</option>
+                    <option value="Itália">Itália</option>
+                    <option value="Japão">Japão</option>
+                    <option value="México">México</option>
+                    <option value="Portugal">Portugal</option>
+                    <option value="Reino Unido">Reino Unido</option>
+                    <option value="Rússia">Rússia</option>
+                    <option value="África do Sul">África do Sul</option>
+                    <option value="Coreia do Sul">Coreia do Sul</option>
+                    <option value="Suíça">Suíça</option>
+                    <option value="Turquia">Turquia</option>
+                </select>
+                <span class="icon">
+                    <i class="fas fa-globe-americas"></i>
+                </span>
+                <div class="input-focus-effect"></div>
+            </div>
+
+            <div class="input-group input-animation">
+                <input type="text" id="estado" name="estado" placeholder="Estado" required>
+                <span class="icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </span>
+                <div class="input-focus-effect"></div>
+            </div>
+
+            <div class="input-group input-animation">
+                <input type="text" id="cidade" name="cidade" placeholder="Cidade" required>
+                <span class="icon">
+                    <i class="fas fa-city"></i>
+                </span>
+                <div class="input-focus-effect"></div>
+            </div>
+
+            <div class="form-options form-options-animation">
+                <label class="custom-checkbox">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <span class="checkmark"></span>
+                    Concordo com os&nbsp;&nbsp;<a href="#" class="terms-link">Termos e Condições</a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-login-animation">
+                <span>Cadastrar</span>
+                <div class="btn-hover-effect"></div>
+            </button>
+            
+            <p class="login-link">
+                Já tem uma conta?&nbsp;&nbsp;<a th:href="@{/login}" class="cadastrar-link">Faça Login</a>
+            </p>
+        </form>
+    </div>
+
+    <!-- Coluna visual com vídeo -->
+    <div class="visual-column">
+        <video autoplay loop muted playsinline>
+            <source th:src="@{/images/Capa-cadastro.mp4}" type="video/mp4">
+            <source th:src="@{/images/Capa-cadastro.webm}" type="video/webm">
+            Seu navegador não suporta o elemento de vídeo.
+        </video>
+        <div class="shape-1"></div>
+        <div class="shape-2"></div>
+        <div class="shape-3"></div>
+        <div class="shape-4"></div>
+    </div>
+</div>
+
+<!-- Carrega o arquivo JavaScript externo -->
+<script th:src="@{/js/cadastro.js}"></script>
+</body>
+</html>

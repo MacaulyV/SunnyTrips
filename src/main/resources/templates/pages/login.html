@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SunnyTrips | Login</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Anime.js para animações -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+<body>
+<div class="page-background">
+    <div class="animated-wave"></div>
+    <div class="animated-wave wave-2"></div>
+    <div class="animated-wave wave-3"></div>
+</div>
+
+<div class="login-container">
+    <!-- Coluna do formulário de login -->
+    <div class="login-form-column">
+        <!-- Logo do projeto -->
+        <img th:src="@{/images/LogoBlackSunnyTrips.png}" alt="Logo SunnyTrips" class="home-icon logo-animation">
+
+        <h2 class="title-animation">Seja bem-vindo</h2>
+        <p class="subtitle-animation">Acesse sua conta e comece a planejar sua próxima viagem!</p>
+
+        <!-- Exibe mensagem de erro, se existir -->
+        <div class="error-message" th:text="${errorMessage}" th:style="${errorMessage != null ? 'display: block;' : 'display: none;'}"></div>
+
+        <form id="loginForm" onsubmit="event.preventDefault(); postLogin();">
+            <div class="input-group input-animation">
+                <input type="email" id="email" name="email" placeholder="Email" required>
+                <span class="icon">
+                        <i class="fas fa-envelope"></i>
+                    </span>
+                <div class="input-focus-effect"></div>
+            </div>
+
+            <div class="input-group input-animation">
+                <input type="password" id="senha" name="senha" placeholder="Senha" required>
+                <span class="icon toggle-password">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                <div class="input-focus-effect"></div>
+            </div>
+
+            <div class="form-options form-options-animation">
+                <div class="remember-me">
+                    <label class="custom-checkbox">
+                        <input type="checkbox" id="remember" name="remember">
+                        <span class="checkmark"></span>
+                        Lembrar por 30 dias
+                    </label>
+                </div>
+                <a href="/cadastro" class="cadastrar-link">Cadastrar</a>
+            </div>
+
+            <button type="submit" class="btn-login-animation">
+                <span>Login</span>
+                <div class="btn-hover-effect"></div>
+            </button>
+
+            <div class="separator separator-animation">ou</div>
+
+            <div class="social-login social-animation">
+                <div class="social-btn apple-btn" aria-label="Login com Apple">
+                    <i class="fab fa-apple"></i>
+                    <div class="hover-ring"></div>
+                </div>
+                <div class="social-btn google-btn" aria-label="Login com Google">
+                    <i class="fab fa-google"></i>
+                    <div class="hover-ring"></div>
+                </div>
+                <div class="social-btn microsoft-btn" aria-label="Login com Microsoft">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="20" height="20">
+                        <path fill="#F25022" d="M0 0h16v16H0z"/>
+                        <path fill="#7FBA00" d="M0 16h16v16H0z"/>
+                        <path fill="#00A4EF" d="M16 0h16v16H16z"/>
+                        <path fill="#FFB900" d="M16 16h16v16H16z"/>
+                    </svg>
+                    <div class="hover-ring"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+<!-- Coluna visual com vídeo -->
+<div class="visual-column">
+    <video autoplay loop muted playsinline>
+        <source th:src="@{/images/Capa-login.mp4}" type="video/mp4">
+        <source th:src="@{/images/Capa-login.webm}" type="video/webm">
+        Seu navegador não suporta o elemento de vídeo.
+    </video>
+</div>
+
+<!-- Carrega o arquivo JavaScript externo -->
+<script th:src="@{/js/login.js}"></script>
+</body>
+</html>
